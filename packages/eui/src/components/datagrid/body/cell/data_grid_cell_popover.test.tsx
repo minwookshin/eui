@@ -185,6 +185,23 @@ describe('useCellPopover', () => {
         expect(document.activeElement).toEqual(mockCell);
       });
 
+      it('returns focus to the cell when its actions are portaled', () => {
+        const { result } = renderHook(useCellPopover);
+        document.body.append(mockCell, mockPopoverAnchor);
+        populateCellPopover(result.current.cellPopoverContext);
+        renderHookAct(() =>
+          result.current.cellPopoverContext.setPopoverAnchor(
+            mockPopoverAnchor,
+            mockCell
+          )
+        );
+        const { getByTestSubject } = render(<>{result.current.cellPopover}</>);
+        fireEvent.keyDown(getByTestSubject('euiDataGridExpansionPopover'), {
+          key: keys.ESCAPE,
+        });
+        expect(document.activeElement).toEqual(mockCell);
+      });
+
       it('closes the popover when the F2 key is pressed', () => {
         const { result, getByTestSubject } = renderCellPopover();
         expect(result.current.cellPopoverContext.popoverIsOpen).toEqual(true);

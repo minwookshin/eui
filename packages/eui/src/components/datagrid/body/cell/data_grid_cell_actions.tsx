@@ -6,7 +6,13 @@
  * Side Public License, v 1.
  */
 
-import React, { JSXElementConstructor, Ref, useMemo, useCallback } from 'react';
+import React, {
+  JSXElementConstructor,
+  Ref,
+  RefObject,
+  useMemo,
+  useCallback,
+} from 'react';
 
 import { useEuiMemoizedStyles } from '../../../../services';
 import { EuiI18n } from '../../../i18n';
@@ -18,6 +24,7 @@ import {
 import { EuiFlexGroup, EuiFlexItem } from '../../../flex';
 import { EuiPopoverFooter } from '../../../popover';
 import { EuiToolTip } from '../../../tool_tip';
+import { EuiPortal } from '../../../portal';
 
 import {
   EuiDataGridColumn,
@@ -25,6 +32,7 @@ import {
   EuiDataGridColumnCellActionProps,
 } from '../../data_grid_types';
 import { euiDataGridCellActionsStyles } from './data_grid_cell_actions.styles';
+import { useCellActionsPlacement } from './use_cell_actions_placement';
 
 export const EuiDataGridCellActions = ({
   onExpandClick,
@@ -32,14 +40,17 @@ export const EuiDataGridCellActions = ({
   column,
   rowIndex,
   colIndex,
+  cellRef,
 }: {
   onExpandClick: () => void;
   popoverAnchorRef: Ref<HTMLDivElement>;
   column?: EuiDataGridColumn;
   rowIndex: number;
   colIndex: number;
+  cellRef?: RefObject<HTMLDivElement>;
 }) => {
   const styles = useEuiMemoizedStyles(euiDataGridCellActionsStyles);
+  const { below, setActionsRef } = useCellActionsPlacement(cellRef);
 
   // Note: The cell expand button/expansion popover is *always* rendered if
   // column.cellActions is present (regardless of column.isExpandable).
@@ -116,8 +127,10 @@ export const EuiDataGridCellActions = ({
     );
   }, [column, colIndex, rowIndex, styles]);
 
-  return (
+  const actions = (
     <div
+      ref={setActionsRef}
+      data-placement={below ? 'below' : undefined}
       css={styles.euiDataGridRowCell__actionsWrapper}
       className="euiDataGridRowCell__actionsWrapper"
     >
@@ -133,6 +146,7 @@ export const EuiDataGridCellActions = ({
       <div ref={popoverAnchorRef} data-test-subject="cellPopoverAnchor" />
     </div>
   );
+  return below ? <EuiPortal>{actions}</EuiPortal> : actions;
 };
 
 export const EuiDataGridCellPopoverActions = ({

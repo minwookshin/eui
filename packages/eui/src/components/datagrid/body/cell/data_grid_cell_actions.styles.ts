@@ -43,17 +43,45 @@ export const euiDataGridCellActionsStyles = (euiThemeContext: UseEuiTheme) => {
       /* Sit below sticky column headers */
       z-index: ${levels.stickyHeader - 1};
 
-      /* The first row of cell actions need to be visible above the cell headers,
-       * but other cell actions that scroll past the sticky headers should not */
-      .euiDataGridRowCell[data-gridcell-visible-row-index='0'] > & {
-        z-index: ${levels.stickyHeader + 1};
-      }
-
       /* Increase non-visible hover zone, to reduce UX friction for
        * users mousing from the cell diagonally over to the actions */
       ${cellSelectors.hoverZone} & {
         ${logicalCSS('min-width', '50%')}
         ${logicalCSS('padding-right', euiTheme.size.base)}
+      }
+
+      &[data-placement='below'] {
+        position: fixed;
+        inset: auto;
+        direction: inherit;
+
+        &[data-actions-hover='true'] {
+          ${logicalCSS('padding-right', euiTheme.size.base)}
+        }
+
+        .euiDataGridRowCell__actions {
+          ${logicalCSS('margin-bottom', 0)}
+          ${logicalCSS('border-top-left-radius', 0)}
+          ${logicalCSS('border-bottom-left-radius', cellOutline.borderRadius)}
+          background-color: var(--euiDataGridCellActionsColor);
+          border-color: var(--euiDataGridCellActionsColor);
+          transform-origin: top;
+
+          &::after {
+            ${logicalCSS('top', 'auto')}
+            ${logicalCSS('bottom', '100%')}
+          }
+        }
+
+        ${euiCanAnimate} {
+          &[data-actions-active='true'] .euiDataGridRowCell__actions {
+            animation: ${slideUp} ${euiTheme.animation.fast} forwards;
+          }
+
+          &[data-actions-hover='true'] .euiDataGridRowCell__actions {
+            animation-delay: ${euiTheme.animation.slow};
+          }
+        }
       }
     `,
 

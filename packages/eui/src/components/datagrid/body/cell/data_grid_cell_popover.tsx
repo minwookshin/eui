@@ -47,7 +47,15 @@ export const useCellPopover = (): {
     colIndex: 0,
   });
   // Popover anchor & content are passed by individual `EuiDataGridCell`s
-  const [popoverAnchor, setPopoverAnchor] = useState<HTMLElement | null>(null);
+  const [popoverAnchor, setAnchor] = useState<HTMLElement | null>(null);
+  const [popoverCell, setPopoverCell] = useState<HTMLElement | undefined>();
+  const setPopoverAnchor = useCallback(
+    (anchor: HTMLElement, cell?: HTMLElement) => {
+      setAnchor(anchor);
+      setPopoverCell(cell);
+    },
+    []
+  );
   const [popoverAnchorPosition, setPopoverAnchorPosition] = useState<
     'downLeft' | 'upLeft'
   >('downLeft');
@@ -73,7 +81,8 @@ export const useCellPopover = (): {
 
       // Toggle our open cell state, which causes EuiDataGridCells to react/check
       // if they should be the open popover and send their anchor+content if so
-      setPopoverAnchor(null); // Resetting the anchor node is required for rerendering to work correctly
+      setAnchor(null); // Resetting the anchor node is required for rerendering to work correctly
+      setPopoverCell(undefined);
       setCellLocation({ rowIndex, colIndex });
       setPopoverIsOpen(true);
     },
@@ -101,7 +110,9 @@ export const useCellPopover = (): {
         event.preventDefault();
         event.stopPropagation();
         closeCellPopover();
-        const cell = popoverAnchor?.closest<HTMLElement>('.euiDataGridRowCell');
+        const cell =
+          popoverCell ??
+          popoverAnchor?.closest<HTMLElement>('.euiDataGridRowCell');
 
         // Prevent cell animation flash while focus is being shifted between popover and cell
         cell?.setAttribute('data-keyboard-closing', 'true');
@@ -112,7 +123,7 @@ export const useCellPopover = (): {
         });
       }
     },
-    [popoverAnchor, closeCellPopover]
+    [popoverAnchor, popoverCell, closeCellPopover]
   );
 
   const cellPopoverContext = useMemo(() => {
@@ -126,14 +137,21 @@ export const useCellPopover = (): {
       setPopoverContent,
       setCellPopoverProps,
     };
-  }, [popoverIsOpen, closeCellPopover, openCellPopover, cellLocation]);
+  }, [
+    popoverIsOpen,
+    closeCellPopover,
+    openCellPopover,
+    cellLocation,
+    setPopoverAnchor,
+  ]);
 
   const styles = useEuiMemoizedStyles(euiDataGridCellPopoverStyles);
 
   const cellPopover = useMemo(() => {
     if (!popoverIsOpen || !popoverAnchor) return null;
 
-    const cell = popoverAnchor.closest<HTMLElement>('.euiDataGridRowCell');
+    const cell =
+      popoverCell ?? popoverAnchor.closest<HTMLElement>('.euiDataGridRowCell');
 
     // Note that this popover is rendered once at the top grid level, rather than one popover per cell.
     //
@@ -179,6 +197,7 @@ export const useCellPopover = (): {
     styles,
     popoverIsOpen,
     popoverAnchor,
+    popoverCell,
     popoverContent,
     cellPopoverProps,
     closeCellPopover,

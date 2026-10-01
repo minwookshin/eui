@@ -77,7 +77,7 @@ export const euiDataGridCellOutlineSelectors = (parentSelector = '&') => {
   const isEntered = ':has([data-focus-lock-disabled="false"])'; // cell focus trap has been entered - ideally show the outline still, but grayed out
 
   // Hover selectors
-  const hover = ':hover'; // hover styles should not supercede focus styles
+  const hover = ':is(:hover, [data-gridcell-actions-hover])'; // Include the portaled cell actions
   const focusWithin = ':focus-within'; // used by :hover:not() to prevent flash of gray when mouse users are opening/closing the expansion popover via cell action click
 
   // Cell header specific selectors
@@ -89,7 +89,7 @@ export const euiDataGridCellOutlineSelectors = (parentSelector = '&') => {
   const is = (selectors: string) => `${parentSelector}:is(${selectors})`;
   const not = (selectors: string) => `${parentSelector}:not(${selectors})`;
   const hoverNot = (selectors: string) =>
-    `${parentSelector}:hover:not(${selectors})`;
+    `${parentSelector}${hover}:not(${selectors})`;
   const _ = (selectors: string) => `${parentSelector}${selectors}`;
 
   return {

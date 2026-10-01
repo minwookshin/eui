@@ -6,7 +6,8 @@
  * Side Public License, v 1.
  */
 
-import React from 'react';
+import React, { useRef } from 'react';
+import { fireEvent, waitFor } from '@testing-library/react';
 import { render } from '../../../../test/rtl';
 
 import { EuiDataGridColumnCellAction } from '../../data_grid_types';
@@ -27,6 +28,87 @@ describe('EuiDataGridCellActions', () => {
     colIndex: 0,
     cellHeightType: 'default',
   };
+
+  it('moves actions below an obstructing header and back above under the sticky header', async () => {
+    let cellTop = 130;
+    const rect = (top: number, height: number) => ({
+      top,
+      bottom: top + height,
+      left: 20,
+      right: 320,
+      width: 300,
+      height,
+      x: 20,
+      y: top,
+      toJSON: () => ({}),
+    });
+    const bounds = jest
+      .spyOn(HTMLElement.prototype, 'getBoundingClientRect')
+      .mockImplementation(function (this: HTMLElement) {
+        return this.classList.contains('euiDataGridHeaderCell')
+          ? rect(100, 30)
+          : this.classList.contains('euiDataGridRowCell')
+          ? rect(cellTop, 36)
+          : rect(100, 300);
+      });
+    const height = jest
+      .spyOn(HTMLElement.prototype, 'offsetHeight', 'get')
+      .mockReturnValue(22);
+    const getStyle = window.getComputedStyle;
+    const styles = jest
+      .spyOn(window, 'getComputedStyle')
+      .mockImplementation((element) => getStyle(element));
+    function Grid() {
+      const cellRef = useRef<HTMLDivElement>(null);
+      return (
+        <div className="euiDataGrid">
+          <div className="euiDataGrid__virtualized">
+            <div className="euiDataGridHeaderCell" />
+            <div ref={cellRef} className="euiDataGridRowCell" tabIndex={0}>
+              <EuiDataGridCellActions {...requiredProps} cellRef={cellRef} />
+            </div>
+          </div>
+        </div>
+      );
+    }
+    try {
+      const { container, getByTestSubject, unmount } = render(<Grid />);
+      const cell = container.querySelector<HTMLElement>('.euiDataGridRowCell')!;
+      const wrapper = () =>
+        getByTestSubject('euiDataGridCellExpandButton').closest(
+          '.euiDataGridRowCell__actionsWrapper'
+        )!;
+      await waitFor(() =>
+        expect(wrapper()).toHaveAttribute('data-placement', 'below')
+      );
+      expect(cell.contains(wrapper())).toBe(false);
+      expect(wrapper()).toHaveStyle({ insetBlockStart: '165px' });
+      cellTop = 125;
+      fireEvent.scroll(container.querySelector('.euiDataGrid__virtualized')!);
+      await waitFor(() =>
+        expect(wrapper()).not.toHaveAttribute('data-placement')
+      );
+      expect(cell.contains(wrapper())).toBe(true);
+      cellTop = 170;
+      fireEvent.scroll(window);
+      await waitFor(() =>
+        expect(wrapper()).not.toHaveAttribute('data-placement')
+      );
+      cellTop = 130;
+      fireEvent.resize(window);
+      await waitFor(() =>
+        expect(wrapper()).toHaveAttribute('data-placement', 'below')
+      );
+      unmount();
+      expect(
+        document.querySelector('.euiDataGridRowCell__actionsWrapper')
+      ).toBeNull();
+    } finally {
+      bounds.mockRestore();
+      height.mockRestore();
+      styles.mockRestore();
+    }
+  });
 
   it('renders an expand button', () => {
     const { getByTestSubject } = render(

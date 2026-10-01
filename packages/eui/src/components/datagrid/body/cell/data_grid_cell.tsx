@@ -450,7 +450,7 @@ export class EuiDataGridCell extends Component<
 
       // Set popover anchor
       const cellAnchorEl = this.popoverAnchorRef.current!;
-      setPopoverAnchor(cellAnchorEl);
+      setPopoverAnchor(cellAnchorEl, this.cellRef.current!);
       // TODO: Potentially switch to `topLeft` based on occlusion with sticky header
       // @see https://github.com/elastic/eui/issues/7828
       setPopoverAnchorPosition('downLeft');
@@ -535,6 +535,12 @@ export class EuiDataGridCell extends Component<
 
   onMouseEnter = () => this.setState({ isHovered: true });
   onMouseLeave = () => this.setState({ isHovered: false });
+
+  setPopoverAnchorRef = (element: HTMLDivElement | null) => {
+    this.popoverAnchorRef.current = element;
+    // A placement change moves the actions between the cell and a portal.
+    if (element) this.handleCellPopover();
+  };
 
   render() {
     const {
@@ -624,6 +630,7 @@ export class EuiDataGridCell extends Component<
           onKeyDown={this.handleCellKeyDown}
           onMouseEnter={this.onMouseEnter}
           onMouseLeave={this.onMouseLeave}
+          data-gridcell-actions-hover={this.state.isHovered ? '' : undefined}
         >
           {isControlColumn && tabularCopyMarkers.hiddenNoCopyBoundary}
           <HandleInteractiveChildren
@@ -667,7 +674,8 @@ export class EuiDataGridCell extends Component<
               colIndex={colIndex}
               column={column}
               onExpandClick={this.handleCellExpansionClick}
-              popoverAnchorRef={this.popoverAnchorRef}
+              cellRef={this.cellRef}
+              popoverAnchorRef={this.setPopoverAnchorRef}
             />
           )}
         </GridCellDiv>

@@ -235,7 +235,7 @@ export interface DataGridCellPopoverContextShape {
   cellLocation: { rowIndex: number; colIndex: number };
   openCellPopover(args: { rowIndex: number; colIndex: number }): void;
   closeCellPopover(): void;
-  setPopoverAnchor(anchor: HTMLElement): void;
+  setPopoverAnchor(anchor: HTMLElement, cell?: HTMLElement): void;
   setPopoverAnchorPosition(position: 'downLeft' | 'upLeft'): void;
   setPopoverContent(content: ReactNode): void;
   setCellPopoverProps: EuiDataGridCellPopoverElementProps['setCellPopoverProps'];
