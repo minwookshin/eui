@@ -224,6 +224,21 @@ describe('FieldValueSelectionFilter', () => {
     });
   });
 
+  it('keeps keyboard selection active after sorting', () => {
+    cy.mount(<FieldValueSelectionFilterWithState />);
+    cy.get('button').click();
+    cy.get('ul[role="listbox"]').focus().realPress('ArrowDown');
+    cy.realPress('Space');
+    cy.contains('li[role="option"]', 'Text').should(
+      'have.attr',
+      'aria-checked',
+      'true'
+    );
+    cy.get('ul[role="listbox"]')
+      .should('have.attr', 'aria-activedescendant')
+      .and('include', 'option-0');
+  });
+
   describe('auto-close testing', () => {
     const selectFilter = () => {
       // Open popover
