@@ -105,6 +105,7 @@ export const EuiForm = forwardRef<HTMLElement, EuiFormProps>(
           {(addressFormErrors: string) => (
             <>
               <EuiCallOut
+                announceOnMount
                 tabIndex={-1}
                 ref={handleFocus}
                 className="euiForm__errors"

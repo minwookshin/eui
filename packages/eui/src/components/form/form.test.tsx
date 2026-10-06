@@ -7,6 +7,7 @@
  */
 
 import React from 'react';
+import { waitFor } from '@testing-library/react';
 import { requiredProps } from '../../test/required_props';
 import { render } from '../../test/rtl';
 
@@ -62,5 +63,25 @@ describe('EuiForm', () => {
     );
 
     expect(container.firstChild).toMatchSnapshot();
+  });
+
+  test('announces errors when the form becomes invalid', async () => {
+    const { rerender, getByRole, queryByRole } = render(<EuiForm />);
+
+    expect(queryByRole('status')).not.toBeInTheDocument();
+
+    rerender(<EuiForm isInvalid error="Enter a valid email address" />);
+
+    expect(getByRole('alert')).toHaveFocus();
+    await waitFor(() => {
+      expect(getByRole('status')).toHaveTextContent(
+        'Please address the highlighted errors., Enter a valid email address'
+      );
+    });
+
+    rerender(<EuiForm isInvalid invalidCallout="none" />);
+
+    expect(queryByRole('alert')).not.toBeInTheDocument();
+    expect(queryByRole('status')).not.toBeInTheDocument();
   });
 });

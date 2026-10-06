@@ -49,6 +49,12 @@ exports[`EuiForm renders with error callout when isInvalid is "true" 1`] = `
           </p>
         </div>
       </div>
+      <div
+        aria-atomic="true"
+        aria-live="polite"
+        class="emotion-euiScreenReaderOnly"
+        role="status"
+      />
     </div>
   </div>
   <div
@@ -110,6 +116,12 @@ exports[`EuiForm renders with error callout when isInvalid is "true" and has mul
           </div>
         </div>
       </div>
+      <div
+        aria-atomic="true"
+        aria-live="polite"
+        class="emotion-euiScreenReaderOnly"
+        role="status"
+      />
     </div>
   </div>
   <div
@@ -164,6 +176,12 @@ exports[`EuiForm renders with error callout when isInvalid is "true" and has one
           </div>
         </div>
       </div>
+      <div
+        aria-atomic="true"
+        aria-live="polite"
+        class="emotion-euiScreenReaderOnly"
+        role="status"
+      />
     </div>
   </div>
   <div
