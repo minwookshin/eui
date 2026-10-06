@@ -99,6 +99,7 @@ export const DefaultItemAction = <T extends object>({
     );
   } else {
     button = (
+      // eslint-disable-next-line @elastic/eui/href-or-on-click -- Actions receive the original event for routing while href preserves native link navigation.
       <EuiButtonEmpty
         className={className}
         size="s"

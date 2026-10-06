@@ -159,6 +159,7 @@ describe('EuiButtonEmpty', () => {
       it('supports onClick and href', () => {
         const handler = jest.fn();
         const { container } = render(
+          // eslint-disable-next-line @elastic/eui/href-or-on-click -- Tests that link clicks invoke the supplied handler.
           <EuiButtonEmpty href="#" onClick={handler} />
         );
         fireEvent.click(container.querySelector('a')!);

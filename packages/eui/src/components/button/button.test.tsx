@@ -187,6 +187,7 @@ describe('EuiButton', () => {
     describe('onClick', () => {
       it('supports onClick and href', () => {
         const handler = jest.fn();
+        // eslint-disable-next-line @elastic/eui/href-or-on-click -- Tests that link clicks invoke the supplied handler.
         const { getByRole } = render(<EuiButton href="#" onClick={handler} />);
         fireEvent.click(getByRole('link'));
         expect(handler).toHaveBeenCalledTimes(1);

@@ -67,6 +67,33 @@ describe('EuiSkipLink', () => {
         expect(scrollSpy).toHaveBeenCalled();
       });
 
+      it.each(['ctrlKey', 'metaKey', 'shiftKey', 'altKey'])(
+        'preserves native navigation for %s clicks',
+        (modifier) => {
+          const focusSpy = jest.fn();
+          mockElement.focus = focusSpy;
+          const onClick = jest.fn();
+          const { getByRole } = render(
+            <EuiSkipLink
+              destinationId="somewhere"
+              overrideLinkBehavior
+              onClick={onClick}
+            >
+              Skip
+            </EuiSkipLink>
+          );
+          const link = getByRole('link');
+          const event = createEvent.click(link, { [modifier]: true });
+
+          fireEvent(link, event);
+
+          expect(link).toHaveAttribute('href', '#somewhere');
+          expect(event.defaultPrevented).toBe(false);
+          expect(focusSpy).not.toHaveBeenCalled();
+          expect(onClick).toHaveBeenCalledTimes(1);
+        }
+      );
+
       afterAll(() => jest.restoreAllMocks());
     });
 

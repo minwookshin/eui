@@ -79,6 +79,11 @@ export const EuiSkipLink: FunctionComponent<EuiSkipLinkProps> = ({
 
   const onClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {
+      if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
+        _onClick?.(e);
+        return;
+      }
+
       let destinationEl: HTMLElement | null = null;
       // Check if the destination ID is valid
       destinationEl = document.getElementById(destinationId);
@@ -128,6 +133,7 @@ export const EuiSkipLink: FunctionComponent<EuiSkipLinkProps> = ({
 
   return (
     <EuiScreenReaderOnly showOnFocus>
+      {/* eslint-disable-next-line @elastic/eui/href-or-on-click -- Keep native link navigation alongside in-page focus handling. */}
       <EuiButton
         css={cssStyles}
         className={classes}

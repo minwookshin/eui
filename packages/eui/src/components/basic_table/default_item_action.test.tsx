@@ -7,7 +7,7 @@
  */
 
 import React from 'react';
-import { fireEvent } from '@testing-library/react';
+import { createEvent, fireEvent } from '@testing-library/react';
 import { render } from '../../test/rtl';
 
 import { DefaultItemAction } from './default_item_action';
@@ -192,4 +192,35 @@ describe('DefaultItemAction', () => {
       expect.objectContaining({ preventDefault: expect.any(Function) })
     );
   });
+
+  it.each(['ctrlKey', 'metaKey'])(
+    'preserves %s and native link navigation for routed actions',
+    (modifier) => {
+      const item = { id: 'xyz' };
+      const onClick = jest.fn();
+      const { getByRole } = render(
+        <DefaultItemAction
+          action={{
+            name: 'Open item',
+            description: 'View item',
+            href: '#/xyz',
+            onClick,
+          }}
+          enabled
+          item={item}
+        />
+      );
+      const link = getByRole('link');
+      const event = createEvent.click(link, { [modifier]: true });
+
+      fireEvent(link, event);
+
+      expect(link).toHaveAttribute('href', '#/xyz');
+      expect(event.defaultPrevented).toBe(false);
+      expect(onClick).toHaveBeenCalledWith(
+        item,
+        expect.objectContaining({ [modifier]: true })
+      );
+    }
+  );
 });
